@@ -23,7 +23,9 @@ for all available filtering parameters):
     >>> api.laureates.filter(gender='female', born_country='Iran')
     [<Laureate id=773>, <Laureate id=817>]
     >>> api.prizes.filter(year=1969)
-    [<Prize category="physics" year=1969>, <Prize category="chemistry" year=1969>, <Prize category="medicine" year=1969>, <Prize category="literature" year=1969>, <Prize category="peace" year=1969>, <Prize category="economics" year=1969>]
+    [<Prize category="physics" year=1969>, <Prize category="chemistry" year=1969>,
+    <Prize category="medicine" year=1969>, <Prize category="literature" year=1969>,
+    <Prize category="peace" year=1969>, <Prize category="economics" year=1969>]
 
 To retrieve a single resource:
 
@@ -59,3 +61,7 @@ takes care of the conversion when filtering and accessing attributes.
 * More ORM-ish stuff, like filtering using Prize, Laureate or Country objects
   as arguments
 * Add relation attributes, like affiliations.
+
+## Credits
+
+This is inspired by the beautifully written [hipchat-api](https://github.com/dobarkod/hipchat-api) wrapper.
