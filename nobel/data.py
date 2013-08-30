@@ -36,7 +36,7 @@ class NobelObject(object):
                 yield type(name).capitalize
 
         camel = camelcase()
-        return "".join(camel.next()(x) if x else '_' for x in name.split("_"))
+        return "".join(next(camel)(x) if x else '_' for x in name.split("_"))
 
     @classmethod
     def _parse(cls, data, full=False):
