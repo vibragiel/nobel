@@ -9,6 +9,7 @@ import nobel
 
 here = os.path.abspath(os.path.dirname(__file__))
 
+
 def pandoc(source, from_format, to_format):
     # http://osiux.com/html-to-restructured-text-in-python-using-pandoc
     # raises OSError if pandoc is not found!
@@ -52,7 +53,7 @@ setup(
     packages=['nobel'],
     include_package_data=True,
     platforms='any',
-    classifiers = [
+    classifiers=[
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.3',
