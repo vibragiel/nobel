@@ -48,6 +48,6 @@ Quick listing:
 
 """
 
-__version__ = '0.1a'
+__version__ = '0.2'
 
 from .api import Api
