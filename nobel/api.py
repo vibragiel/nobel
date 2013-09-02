@@ -42,12 +42,12 @@ class Api(object):
         json = resp.json()
         errmsg = {}
         if 'error' in json:
-            if isinstance(json['error'], unicode):
+            if isinstance(json['error'], basestring):
                 errmsg = json['error']
             else:
-                errmsg = json.get('message', 'Unknown error.')
+                errmsg = json['error'].get('message', 'Unknown error.')
 
-        # For some reson, errors in the country resource come as HTTP 200
+        # For some reason, errors in the country resource come as HTTP 200
         if code == 200 and not 'error' in json:
             return json
         elif code == 400:
