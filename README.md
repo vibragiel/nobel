@@ -1,4 +1,5 @@
 # A Pythonic wrapper for the Nobel Prize API
+[![Build Status](https://travis-ci.org/vibragiel/nobel.png)](https://travis-ci.org/vibragiel/nobel)[![Coverage Status](https://coveralls.io/repos/vibragiel/nobel/badge.png)](https://coveralls.io/r/vibragiel/nobel)
 
 A simple Python wrapper for the [Nobel Prize API](http://www.nobelprize.org/nobel_organizations/nobelmedia/nobelprize_org/developer/).
 
