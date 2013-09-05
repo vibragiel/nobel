@@ -7,7 +7,7 @@ from pkg_resources import normalize_path
 import os
 import subprocess
 import sys
-import nobel
+from nobel import __version__
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -68,7 +68,7 @@ class PyTest(TestCommand):
 
 setup(
     name='nobel',
-    version=nobel.__version__,
+    version=__version__,
     url='https://github.com/vibragiel/nobel',
     license='Apache Software License',
     author='Gabriel Rodríguez Alberich',
