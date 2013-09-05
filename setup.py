@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
-from setuptools import setup
+from setuptools import setup, find_packages
+from setuptools.command.test import test as TestCommand
+from pkg_resources import normalize_path
 import os
-import sys
 import subprocess
+import sys
 import nobel
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -39,18 +41,45 @@ if sys.version_info >= (3, 0):
         use_2to3_fixers=['custom_fixers']
     )
 
+
+class PyTest(TestCommand):
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = ['nobel/test']
+        self.test_suite = True
+
+    def run_tests(self):
+        import pytest
+
+        # Purge modules under test from sys.modules. The test loader will
+        # re-import them from the build location. Required when 2to3 is used
+        # with namespace packages.
+        if sys.version_info >= (3,) and \
+                getattr(self.distribution, 'use_2to3', False):
+            sys.modules.__delitem__('nobel')
+            sys.modules.__delitem__('nobel.api')
+
+            ## Run on the build directory for 2to3-built code.
+            ei_cmd = self.get_finalized_command("egg_info")
+            self.test_args = [normalize_path(ei_cmd.egg_base)]
+
+        errno = pytest.main(self.test_args)
+        sys.exit(errno)
+
 setup(
     name='nobel',
     version=nobel.__version__,
     url='https://github.com/vibragiel/nobel',
     license='Apache Software License',
     author='Gabriel Rodríguez Alberich',
-    tests_require=[],
+    tests_require=['pytest', 'mock'],
+    test_suite='test',
+    cmdclass={'test': PyTest},
     install_requires=['requests>=0.13.3'],
     author_email='gabi@gabi.is',
     description=description,
     long_description=long_description,
-    packages=['nobel'],
+    packages=find_packages(exclude=['ez_setup']),
     include_package_data=True,
     platforms='any',
     classifiers=[

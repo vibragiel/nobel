@@ -1,5 +1,6 @@
 import datetime
 import re
+import sys
 from .api import NotFoundError, MultipleObjectsError
 
 
@@ -13,8 +14,8 @@ class NobelObject(object):
 
     """
 
-    attributes = []
-    unique_together = []
+    attributes = ()
+    unique_together = ()
     resource = ''
     resource_plural = ''
     api = None
@@ -97,7 +98,8 @@ class NobelObject(object):
 
         """
 
-        data = cls.api._get(cls.resource + '.json', **kwargs)
+        camel_kwargs = dict((cls._camelize(k), v) for k, v in kwargs.items())
+        data = cls.api._get(cls.resource + '.json', **camel_kwargs)
         if len(data[cls.resource_plural]) == 0:
             raise NotFoundError('No resources found.')
         elif len(data[cls.resource_plural]) > 1:
@@ -129,6 +131,9 @@ class NobelObject(object):
     def __str__(self):
         return unicode(self).encode('utf-8')
 
+    def __unicode__(self):
+        return unicode(self.__class__.__name__)
+
     def __repr__(self):
         classname = self.__class__.__name__
         params = []
@@ -138,8 +143,12 @@ class NobelObject(object):
                 if isinstance(value, basestring):
                     params.append('%s="%s"' % (field, value))
                 else:
-                    params.append('%s=%s' % (field, value))
-        return '<%s %s>' % (classname, " ".join(params))
+                    params.append('%s=%d' % (field, value))
+        value = '<%s %s>' % (classname, " ".join(params))
+        if sys.version_info < (3, 0):
+            return value.encode('utf8')
+        else:
+            return value
 
     def __getattr__(self, name):
         """Updates instance with fresh data from the server if a well-known
