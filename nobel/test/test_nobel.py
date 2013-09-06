@@ -242,6 +242,12 @@ class TestData:
                                                 'attrC': 2, 'attrD': 'qux'}]}
         assert obj.attr_c == 2
 
+    @mock.patch('nobel.Api._get')
+    def test_undefined_full_attribute_access(self, mocked_get):
+        obj = self.MyObject()
+        del obj.full
+        assert obj.full is False
+
     def test_repr(self):
         obj = self.MyObject()
         obj.attr_a = u'fóo'
@@ -260,3 +266,93 @@ class TestData:
         obj.attr_b = 2
         if sys.version_info < (3, 0):
             assert obj.__unicode__() == u'MyObject'
+
+
+class TestLaureate:
+
+    def setup_method(self, method):
+        self.api = nobel.Api()
+
+    @mock.patch('nobel.api.Api.countries')
+    @mock.patch('nobel.prizes.Prize._parse')
+    def test_parse(self, mocked_parse, mocked_countries):
+        mocked_parse.return_value = 'prize object'
+        mocked_countries.side_effect = [type('Country', (), {})(),
+                                        type('Country', (), {})()]
+        data = {u'id': u'4', u'firstname': u'Alfred', u'surname': u'Nobel',
+                u'bornCountry': u'Sweden', u'bornCity': u'Stockholm',
+                u'diedCountry': u'Italy', u'diedCity': u'Sanremo',
+                u'gender': u'male', u'born': u'1833-10-21',
+                u'died': u'1896-12-10', u'prizes': ['prize_1', 'prize_2'],
+                u'bornCountryCode': 'SE', u'diedCountryCode': u'IT'
+                }
+        obj = self.api.laureates._parse(data)
+        assert obj.id == 4
+        assert obj.born == datetime.date(year=1833, month=10, day=21)
+        assert obj.died == datetime.date(year=1896, month=12, day=10)
+        mocked_parse.assert_any_call('prize_1', full=False)
+        mocked_parse.assert_any_call('prize_2', full=False)
+        assert mocked_parse.call_count == 2
+        assert obj.prizes == ['prize object', 'prize object']
+        assert obj.born_country.name == u'Sweden'
+        assert obj.born_country.code == u'SE'
+        assert obj.died_country.name == u'Italy'
+        assert obj.died_country.code == u'IT'
+
+    def test_unicode(self):
+        data = {u'id': u'4', u'firstname': u'Toño', u'surname': u'Ñandú'}
+        obj = self.api.laureates._parse(data)
+        if sys.version_info < (3, 0):
+            assert obj.__unicode__() == u'Toño Ñandú'
+        else:
+            assert obj.__str__() == 'Toño Ñandú'
+
+    @mock.patch('nobel.data.NobelObject.__getattr__')
+    def test_unicode_without_surname(self, mocked_getattr):
+        mocked_getattr.side_effect = AttributeError
+        data = {u'id': u'4', u'firstname': u'Toño'}
+        obj = self.api.laureates._parse(data)
+        if sys.version_info < (3, 0):
+            assert obj.__unicode__() == u'Toño'
+        else:
+            assert obj.__str__() == 'Toño'
+
+
+class TestPrize:
+
+    def setup_method(self, method):
+        self.api = nobel.Api()
+
+    @mock.patch('nobel.laureates.Laureate._parse')
+    def test_parse(self, mocked_parse):
+        mocked_parse.return_value = 'laureate object'
+        data = {u'category': u'physics', u'year': u'2006',
+                u'laureates': ['laureate_1', 'laureate_2']}
+        obj = self.api.prizes._parse(data)
+        assert obj.year == 2006
+        mocked_parse.assert_any_call('laureate_1', full=False)
+        mocked_parse.assert_any_call('laureate_2', full=False)
+        assert mocked_parse.call_count == 2
+        assert obj.laureates == ['laureate object', 'laureate object']
+
+    def test_unicode(self):
+        data = {u'category': u'physics', u'year': u'2006'}
+        obj = self.api.prizes._parse(data)
+        if sys.version_info < (3, 0):
+            assert obj.__unicode__() == u'Physics, 2006'
+        else:
+            assert obj.__str__() == 'Physics, 2006'
+
+
+class TestCountry:
+
+    def setup_method(self, method):
+        self.api = nobel.Api()
+
+    def test_unicode(self):
+        data = {u'name': u'Spain', u'code': u'ES'}
+        obj = self.api.countries._parse(data)
+        if sys.version_info < (3, 0):
+            assert obj.__unicode__() == u'Spain'
+        else:
+            assert obj.__str__() == 'Spain'
