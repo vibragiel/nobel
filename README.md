@@ -74,7 +74,6 @@ $ pip install nobel
 ## TODO
 
 * Documentation and full reference
-* Tests
 * More ORM-ish stuff, like filtering using Prize, Laureate or Country objects
   as arguments
 * Add relation attributes, like affiliations.
