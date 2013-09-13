@@ -335,6 +335,22 @@ class TestPrize:
         assert mocked_parse.call_count == 2
         assert obj.laureates == ['laureate object', 'laureate object']
 
+    @mock.patch('nobel.laureates.Laureate._parse')
+    def test_parse_motivation_in_laureate(self, mocked_parse):
+        mocked_parse.return_value = 'laureate object'
+        data = {u'category': u'physics', u'year': u'2006',
+                u'laureates': [{u'id': 1, u'motivation': u'because'}]}
+        obj = self.api.prizes._parse(data)
+        assert obj.motivation == u'because'
+
+    @mock.patch('nobel.laureates.Laureate._parse')
+    def test_parse_motivation_in_prize(self, mocked_parse):
+        mocked_parse.return_value = 'laureate object'
+        data = {u'category': u'physics', u'year': u'2006',
+                u'motivation': u'because'}
+        obj = self.api.prizes._parse(data)
+        assert obj.motivation == u'because'
+
     def test_unicode(self):
         data = {u'category': u'physics', u'year': u'2006'}
         obj = self.api.prizes._parse(data)
